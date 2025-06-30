@@ -1,0 +1,22 @@
+services:
+  arcface_service:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: arcface_service
+    restart: unless-stopped
+    environment:
+      PG_DB:       SCOUT_DB
+      PG_USER:     postgres
+      PG_PASSWORD: 12345678
+      PG_HOST:     host.docker.internal   # o la IP/host de tu Postgres real
+      PG_PORT:     "5432"
+      THRESHOLD:   "0.5"
+    ports:
+      - "8001:8001"
+    networks:
+      - backend
+
+networks:
+  backend:
+    driver: bridge

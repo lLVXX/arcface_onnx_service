@@ -136,20 +136,22 @@ def guardar_imagen_dinamica(estudiante_id: int, image: Image.Image, embedding: n
 # ----------------------------
 @app.post("/generar_embedding/")
 async def generar_embedding(file: UploadFile = File(...)):
-    print("🚀 [EMBEDDING] Iniciando generación...")
     try:
-        image = Image.open(BytesIO(await file.read())).convert("RGB")
+        content = await file.read()
+        image = Image.open(BytesIO(content)).convert("RGB")
         print(f"📥 Imagen recibida: {file.filename}")
     except Exception as e:
-        raise HTTPException(status_code=400, detail=f"Error leyendo imagen: {e}")
+        raise HTTPException(status_code=400, detail=f"Error al procesar imagen: {e}")
 
     faces = face_app.get(np.array(image))
     print(f"🔍 Rostros detectados: {len(faces)}")
+
     if not faces:
         return {"ok": False, "msg": "No se detectó rostro"}
 
     embedding = faces[0].embedding.tolist()
     return {"ok": True, "embedding": embedding}
+
 
 @app.post("/match_faces/")
 async def match_faces(file: UploadFile = File(...)):
